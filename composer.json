@@ -1,6 +1,8 @@
 {
 	"require": {
-		"epochblue/philip": "1.0.*"
+		"epochblue/philip": "1.0.*",
+		"doctrine/orm": "*",
+		"doctrine/migrations": "1.0.*@dev"
 	},
 	"autoload": {
 		"psr-4": {

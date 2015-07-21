@@ -3,6 +3,7 @@ namespace MyIRCBot;
 
 use Philip\IRC\Response;
 use Philip\Philip;
+use MyIRCBot\Entities\User;
 
 class IRC
 {
