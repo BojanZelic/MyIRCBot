@@ -2,8 +2,10 @@
 	"require": {
 		"epochblue/philip": "1.0.*",
 		"doctrine/orm": "*",
-		"doctrine/migrations": "1.0.*@dev"
+		"doctrine/migrations": "^1.0@RC"
 	},
+	"prefer-stable": true,
+	"minimum-stability" : "dev",
 	"autoload": {
 		"psr-4": {
 			"MyIRCBot\\": "MyIRCBot/"

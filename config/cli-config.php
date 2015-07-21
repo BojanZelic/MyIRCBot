@@ -11,7 +11,7 @@ $isDevMode = false;
 $dbParams = require_once('db.php');
 
 // Any way to access the EntityManager from your application
-$config = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
+$config = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, null, null, false);
 $em = EntityManager::create($dbParams, $config);
 
 $helperSet = new \Symfony\Component\Console\Helper\HelperSet(array(
