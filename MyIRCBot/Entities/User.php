@@ -3,6 +3,7 @@
 namespace MyIRCBot\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
+use Philip\IRC\Request;
 
 /**
  * User
@@ -85,7 +86,7 @@ class User
     {
         if ($this->hp > 0)
         {
-            $this->hp = $this->hp -= floor($damage);
+            $this->hp -= floor($damage);
         }
 
         if ($this->hp < 0)
@@ -94,6 +95,32 @@ class User
         }
 
         return $damage;
+    }
+
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    public function getMaxHP()
+    {
+        return $this->maxhp;
+    }
+
+    public function updateFromRequest(Request $request)
+    {
+        $this->ipAddress    = $request->getHost();
+        $this->username     = $request->getSendingUser();
+        if (!$this->getLevel()) {
+            $this->level = 1;
+        }
+    }
+
+    public function __toString()
+    {
+        return
+          "Level: " . $this->getLevel() . "\n" .
+          "HP: " . $this->getHP() . "/" . $this->getMaxHP() . "\n";
     }
 
 }

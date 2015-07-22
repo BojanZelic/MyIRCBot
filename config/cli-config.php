@@ -3,16 +3,10 @@ require_once('bootstrap.php');
 
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
+use MyIRCBot\Utilities\IRCController;
 
-$paths = array(__DIR__."/../MyIRCBot/Entities");
-$isDevMode = false;
-
-// the connection configuration
-$dbParams = require_once('db.php');
-
-// Any way to access the EntityManager from your application
-$config = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, null, null, false);
-$em = EntityManager::create($dbParams, $config);
+$controller = new IRCController();
+$em = $controller->getEm();
 
 $helperSet = new \Symfony\Component\Console\Helper\HelperSet(array(
 	'db' => new \Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper($em->getConnection()),
