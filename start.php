@@ -1,18 +1,17 @@
 <?php
 require_once('bootstrap.php');
 
-$config = array(
-	"server"       => "irc.dev",
-	"port"         => 6667,
-	"username"     => "jQuery",
-	"realname"     => "Why not javascript??",
-	"nick"         => "jQuery",
-	"channels"     => array( '#dev' ),
-	"unflood"      => 500,
-	"debug"        => true,
-	"log"          => __DIR__ . '/bot.log',
-);
+$config = include(__DIR__ . '/config/irc.php');
 
-$irc = new \MyIRCBot\IRC();
-$irc->setConfig($config);
-$irc->main();
+
+if (isset($argv[1]) && $argv[1] == 'minion')
+{
+	$minion = new \MyIRCBot\Minion();
+	$minion->setConfig($config);
+	$minion->main();
+
+} else {
+	$irc = new \MyIRCBot\IRC();
+	$irc->setConfig($config);
+	$irc->main();
+}

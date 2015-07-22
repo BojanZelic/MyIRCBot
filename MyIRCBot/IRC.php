@@ -33,6 +33,11 @@ class IRC extends IRCController
 	{
 		$this->bot = new Philip($this->_config);
 
+		for($i = 0; $i < 2; $i++)
+		{
+			exec('php ' . __DIR__ . '/../start.php minion > /dev/null &');
+		}
+
 		$this->bot->onMessages('/\$\([\'`"]#(.*)[\'`"]\)\.(.*)\(\)/', function($event) {
 			$matches = $event->getMatches();
 			$username = $matches[0];
@@ -69,8 +74,6 @@ class IRC extends IRCController
 
 		$this->muliLineMsg($event, $msg);
 	}
-
-
 
 	public function doDamage(User &$user, $action)
 	{
