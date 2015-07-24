@@ -33,9 +33,10 @@ class IRC extends IRCController
 	{
 		$this->bot = new Philip($this->_config);
 
-		for($i = 0; $i < 2; $i++)
+		for($i = 0; $i < 10; $i++)
 		{
-			exec('php ' . __DIR__ . '/../start.php minion > /dev/null &');
+			$rand = rand(1, 4000);
+			exec('php ' . __DIR__ . "/../start.php minion $rand> /dev/null &");
 		}
 
 		$this->bot->onMessages('/\$\([\'`"]#(.*)[\'`"]\)\.(.*)\(\)/', function($event) {

@@ -6,9 +6,18 @@ use Philip\Philip;
 
 class Minion
 {
+	/**
+	 * @var Philip
+	 */
 	private $bot;
 
 	private $config;
+	private $minionNum;
+
+	public function __construct($minionNum)
+	{
+		$this->minionNum = $minionNum;
+	}
 
 	public function main()
 	{
@@ -17,11 +26,16 @@ class Minion
 		$this->bot->run();
 	}
 
+	public function SetActionKilled()
+	{
+		$this->bot->onPrivateMessage("/killed/", function($response) {
+
+		});
+	}
+
 	public function setConfig($config)
 	{
-		$config = include(__DIR__ . '/../config/irc.php');
-
-		$username = 'Minion'.  rand(1, 4000);
+		$username = "Minion" . $this->minionNum;
 		$config['username'] = $username;
 		$config['nick'] = $username;
 

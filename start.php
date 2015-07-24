@@ -6,7 +6,7 @@ $config = include(__DIR__ . '/config/irc.php');
 
 if (isset($argv[1]) && $argv[1] == 'minion')
 {
-	$minion = new \MyIRCBot\Minion();
+	$minion = new \MyIRCBot\Minion($argv[2]);
 	$minion->setConfig($config);
 	$minion->main();
 
