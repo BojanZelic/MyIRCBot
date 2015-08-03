@@ -1,12 +1,12 @@
 <?php
 
 return array(
-	"server"       => "irc.rr.afternet.org",
+	"server"       => "irc.dev",
 	"port"         => 6667,
 	"username"     => "jQuery",
 	"realname"     => "Why not javascript??",
 	"nick"         => "jQuery",
-	"channels"     => array( '#eevblog' ),
+	"channels"     => array( '#dev' ),
 	"unflood"      => 500,
 	"debug"        => true,
 	"log"          => __DIR__ . '/bot.log',

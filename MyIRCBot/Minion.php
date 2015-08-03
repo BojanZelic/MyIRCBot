@@ -22,14 +22,16 @@ class Minion
 	public function main()
 	{
 		$this->bot = new Philip($this->config);
+		$this->setActionKilled();
 
 		$this->bot->run();
 	}
 
-	public function SetActionKilled()
+	private function setActionKilled()
 	{
 		$this->bot->onPrivateMessage("/killed/", function($response) {
-
+			//do validation to make sure it came from authorized user
+			$this->bot->askStop();
 		});
 	}
 

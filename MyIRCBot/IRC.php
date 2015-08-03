@@ -3,6 +3,7 @@ namespace MyIRCBot;
 
 use MyIRCBot\Repositories\UserRepository;
 use MyIRCBot\Utilities\IRCController;
+use MyIRCBot\Utilities\StringTools;
 use Philip\IRC\Event;
 use Philip\IRC\Response;
 use Philip\Philip;
@@ -33,20 +34,22 @@ class IRC extends IRCController
 	{
 		$this->bot = new Philip($this->_config);
 
-		for($i = 0; $i < 10; $i++)
+		for($i = 0; $i < 2; $i++)
 		{
 			$rand = rand(1, 4000);
-			exec('php ' . __DIR__ . "/../start.php minion $rand> /dev/null &");
+			//exec('php ' . __DIR__ . "/../start.php minion $rand> /dev/null &");
 		}
 
-		$this->bot->onMessages('/\$\([\'`"]#(.*)[\'`"]\)\.(.*)\(\)/', function($event) {
+		$this->bot->onMessages('/\$\([\'‘“`"]#(.*)[\'`’”"]\)\.(.*)\(\)/u', function($event) {
 			$matches = $event->getMatches();
 			$username = $matches[0];
 			$action = "action" . $matches[1];
 
 			if (!isset($this->_users[$username]))
 			{
-				$this->_users[$username] = new User();
+				$user = new User();
+				$user->setUsername($username);
+				$this->_users[$username] = $user;
 			}
 
 			if (method_exists($this, $action)){
@@ -71,23 +74,39 @@ class IRC extends IRCController
 		$matches = $event->getMatches();
 		$username = $matches[0];
 
-		$msg = $this->doDamage($this->_users[$username], Actions::PUNCHED);
+		$user = $this->_users[$username];
+		$msg = $this->doDamage($user, Actions::PUNCHED);
+
+		if ($user->getIsMinion() && ($user->getHp() == 0))
+		{
+			$event->addResponse(Response::msg($user->getUsername(), 'killed'));
+		}
 
 		$this->muliLineMsg($event, $msg);
+	}
+
+	public function actionFlip(Event $event)
+	{
+		$matches = $event->getMatches();
+		$username = $matches[0];
+
+		$event->addResponse(Response::action($event->getRequest()->getSource(),
+			"(╯ಥ益ಥ）╯﻿︵ " . StringTools::flip($username)));
 	}
 
 	public function doDamage(User &$user, $action)
 	{
 		$username = $user->getUsername();
-		$initHP =  $user->getHP();
+		$maxHP = $user->getMaxHP();
 		$damage = $user->doDamage(rand(0,40));
 		$newHP = $user->getHP();
 
-		$msg = "========================";
-		$msg .= "\n $username HP:$initHP";
-		$msg .= "\n $username was $action and took $damage Damage";
-		$msg .= "\n $username now has $newHP HP";
-		$msg .= "\n ------------------------";
+		$msg = "\n $username HP:$newHP/$maxHP";
+		if ($newHP == 0) {
+			$msg .= "\n $username has died";
+		} else {
+			$msg .= "\n $username was $action and took $damage Damage";
+		}
 
 		return $msg;
 	}

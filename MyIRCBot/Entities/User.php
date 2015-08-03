@@ -57,14 +57,22 @@ class User
      */
     private $level;
 
+    private $isMinion = false;
+
     public function __construct()
     {
         $this->hp = 40;
+        $this->maxhp = 40;
     }
 
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setUsername($value)
+    {
+        $this->username = $value;
     }
 
     public function getipAddress()
@@ -84,6 +92,8 @@ class User
 
     public function doDamage($damage)
     {
+        $damage = min($this->hp, $damage);
+
         if ($this->hp > 0)
         {
             $this->hp -= floor($damage);
@@ -107,10 +117,26 @@ class User
         return $this->maxhp;
     }
 
+    private function setIsMinion($value)
+    {
+        $this->isMinion = $value;
+    }
+
+    public function getIsMinion()
+    {
+        return $this->isMinion;
+    }
+
     public function updateFromRequest(Request $request)
     {
         $this->ipAddress    = $request->getHost();
         $this->username     = $request->getSendingUser();
+
+        //depending on how different a Minion becomes from a user.
+        // I may consider creating a UserFactory that creates Users/Minions
+        if (stripos($this->username, 'Minion') !== false){
+            $this->setIsMinion(true);
+        }
         if (!$this->getLevel()) {
             $this->level = 1;
         }
