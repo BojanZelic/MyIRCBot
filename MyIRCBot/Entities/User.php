@@ -57,6 +57,8 @@ class User
      */
     private $level;
 
+    private $state;
+
     private $isMinion = false;
 
     public function __construct()
@@ -73,6 +75,27 @@ class User
     public function setUsername($value)
     {
         $this->username = $value;
+    }
+
+    public function addState(State $state)
+    {
+        $this->state[] = $state;
+    }
+
+    public function isConfused()
+    {
+        if (isset($this->state))
+        {
+            foreach ($this->state as $state)
+            {
+                if ($state === STATE::CONFUSED)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public function getipAddress()

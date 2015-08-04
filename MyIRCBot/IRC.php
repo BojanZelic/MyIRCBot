@@ -1,6 +1,7 @@
 <?php
 namespace MyIRCBot;
 
+use MyIRCBot\Entities\State;
 use MyIRCBot\Repositories\UserRepository;
 use MyIRCBot\Utilities\IRCController;
 use MyIRCBot\Utilities\StringTools;
@@ -40,7 +41,7 @@ class IRC extends IRCController
 			//exec('php ' . __DIR__ . "/../start.php minion $rand> /dev/null &");
 		}
 
-		$this->bot->onMessages('/\$\([\'‘“`"]#(.*)[\'`’”"]\)\.(.*)\(\)/u', function($event) {
+		$this->bot->onMessages('/\$\([\'‘“`"][#\.](.*)[\'`’”"]\)\.(.*)\(\)/u', function(Event $event) {
 			$matches = $event->getMatches();
 			$username = $matches[0];
 			$action = "action" . $matches[1];
@@ -50,6 +51,14 @@ class IRC extends IRCController
 				$user = new User();
 				$user->setUsername($username);
 				$this->_users[$username] = $user;
+			}
+
+			$sendingUser = $event->getRequest()->getSendingUser();
+			if (!isset($this->_users[$sendingUser]))
+			{
+				$user = new User();
+				$user->setUsername($sendingUser);
+				$this->_users[$sendingUser] = $user;
 			}
 
 			if (method_exists($this, $action)){
@@ -75,7 +84,7 @@ class IRC extends IRCController
 		$username = $matches[0];
 
 		$user = $this->_users[$username];
-		$msg = $this->doDamage($user, Actions::PUNCHED);
+		$msg = $this->doDamage($user);
 
 		if ($user->getIsMinion() && ($user->getHp() == 0))
 		{
@@ -89,23 +98,54 @@ class IRC extends IRCController
 	{
 		$matches = $event->getMatches();
 		$username = $matches[0];
+		$user = $this->_users[$username];
 
-		$event->addResponse(Response::action($event->getRequest()->getSource(),
-			"(╯ಥ益ಥ）╯﻿︵ " . StringTools::flip($username)));
+		$sendingUser = $this->_users[$event->getRequest()->getSendingUser()];
+
+		if ($sendingUser->isConfused())
+		{
+			$sendingUsername = $sendingUser->getUsername();
+
+			$event->addResponse(Response::action($event->getRequest()->getSource(),
+				"$sendingUsername flipped itself in confusion (╯ಥ益ಥ）╯﻿︵ " . StringTools::flip($sendingUsername)));
+		} else {
+			$event->addResponse(Response::action($event->getRequest()->getSource(),
+				"(╯ಥ益ಥ）╯﻿︵ " . StringTools::flip($user->getUsername())));
+		}
 	}
 
-	public function doDamage(User &$user, $action)
+	public function actionConfuse(Event $event)
+	{
+		$matches = $event->getMatches();
+		$username = $matches[0];
+		$user = $this->_users[$username];
+
+		$msg = "";
+		if ($user->isConfused())
+		{
+			$msg .= "$username is already CONFUSED!";
+		} else {
+			$msg .= "$username is CONFUSED. It hurt itself in it's confusion! ";
+
+			$user->addState(new State(State::CONFUSED));
+			$msg .= $this->doDamage($user);
+		}
+
+		$this->muliLineMsg($event, $msg);
+	}
+
+	public function doDamage(User &$user)
 	{
 		$username = $user->getUsername();
+
 		$maxHP = $user->getMaxHP();
 		$damage = $user->doDamage(rand(0,40));
 		$newHP = $user->getHP();
 
-		$msg = "\n $username HP:$newHP/$maxHP";
+		$msg = "\n $username took $damage Damage. HP:$newHP/$maxHP";
+
 		if ($newHP == 0) {
-			$msg .= "\n $username has died";
-		} else {
-			$msg .= "\n $username was $action and took $damage Damage";
+			$msg = "\n $username is KO'd";
 		}
 
 		return $msg;
