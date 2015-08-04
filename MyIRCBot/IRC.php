@@ -125,7 +125,7 @@ class IRC extends IRCController
 		{
 			$msg .= "$username is already CONFUSED!";
 		} else {
-			$msg .= "$username is CONFUSED. It hurt itself in it's confusion! ";
+			$msg .= "$username is CONFUSED. It hurt itself in its confusion! ";
 
 			$user->addState(new State(State::CONFUSED));
 			$msg .= $this->doDamage($user);

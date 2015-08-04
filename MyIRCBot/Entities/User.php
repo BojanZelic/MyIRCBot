@@ -57,7 +57,7 @@ class User
      */
     private $level;
 
-    private $state;
+    private $state = array();
 
     private $isMinion = false;
 
