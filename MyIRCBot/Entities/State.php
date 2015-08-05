@@ -31,4 +31,9 @@ class State
 		$this->state = $state;
 	}
 
+	public function getState()
+	{
+		return $this->state;
+	}
+
 }

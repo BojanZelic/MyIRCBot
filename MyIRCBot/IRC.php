@@ -84,7 +84,17 @@ class IRC extends IRCController
 		$username = $matches[0];
 
 		$user = $this->_users[$username];
-		$msg = $this->doDamage($user);
+		$sendingUser = $this->_users[$event->getRequest()->getSendingUser()];
+		if ($sendingUser->isConfused())
+		{
+			$username = $sendingUser->getUsername();
+			$msg = "$username punched himself in confusion." . $this->doDamage($sendingUser);
+		}
+		else
+		{
+			$msg = $this->doDamage($user);
+		}
+
 
 		if ($user->getIsMinion() && ($user->getHp() == 0))
 		{
@@ -118,17 +128,17 @@ class IRC extends IRCController
 	{
 		$matches = $event->getMatches();
 		$username = $matches[0];
-		$user = $this->_users[$username];
+		$user = &$this->_users[$username];
 
 		$msg = "";
 		if ($user->isConfused())
 		{
 			$msg .= "$username is already CONFUSED!";
 		} else {
-			$msg .= "$username is CONFUSED. It hurt itself in its confusion! ";
+			$msg .= "$username is now CONFUSED.";
 
 			$user->addState(new State(State::CONFUSED));
-			$msg .= $this->doDamage($user);
+			//$msg .= $this->doDamage($user);
 		}
 
 		$this->muliLineMsg($event, $msg);

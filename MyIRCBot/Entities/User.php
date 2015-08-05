@@ -57,6 +57,9 @@ class User
      */
     private $level;
 
+    /**
+     * @var State[]
+     */
     private $state = array();
 
     private $isMinion = false;
@@ -88,7 +91,7 @@ class User
         {
             foreach ($this->state as $state)
             {
-                if ($state === STATE::CONFUSED)
+                if ($state->getState() === STATE::CONFUSED)
                 {
                     return true;
                 }
