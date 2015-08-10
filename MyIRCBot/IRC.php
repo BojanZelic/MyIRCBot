@@ -124,6 +124,27 @@ class IRC extends IRCController
 		}
 	}
 
+	public function actionHadouken(Event $event)
+	{
+		$matches = $event->getMatches();
+		$username = $matches[0];
+		$user = $this->_users[$username];
+
+		$sendingUser = $this->_users[$event->getRequest()->getSendingUser()];
+		$sendingUsername = $sendingUser->getUsername();
+
+		if ($sendingUser->isConfused())
+		{
+			$msg = "$sendingUsername ༼つಠ益ಠ༽つ ─=≡ΣO)) " . $sendingUsername . $this->doDamage($user);
+
+		} else {
+
+			$msg = "$sendingUsername ༼つಠ益ಠ༽つ ─=≡ΣO)) " .  $user->getUsername() . $this->doDamage($user);
+		}
+
+		$this->muliLineMsg($event, $msg);
+	}
+
 	public function actionConfuse(Event $event)
 	{
 		$matches = $event->getMatches();
