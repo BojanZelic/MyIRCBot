@@ -1,6 +1,7 @@
 <?php
 namespace MyIRCBot;
 
+use MyIRCBot\Entities\Attacks\Hadouken;
 use MyIRCBot\Entities\State;
 use MyIRCBot\Repositories\UserRepository;
 use MyIRCBot\Utilities\IRCController;
@@ -131,16 +132,10 @@ class IRC extends IRCController
 		$user = $this->_users[$username];
 
 		$sendingUser = $this->_users[$event->getRequest()->getSendingUser()];
-		$sendingUsername = $sendingUser->getUsername();
 
-		if ($sendingUser->isConfused())
-		{
-			$msg = "$sendingUsername ༼つಠ益ಠ༽つ ─=≡ΣO)) " . $sendingUsername . $this->doDamage($user);
-
-		} else {
-
-			$msg = "$sendingUsername ༼つಠ益ಠ༽つ ─=≡ΣO)) " .  $user->getUsername() . $this->doDamage($user);
-		}
+		$hadouken = new Hadouken();
+		$hadouken->performAttack($sendingUser, $user);
+		$msg = $hadouken->getDisplay($sendingUser, $user);
 
 		$this->muliLineMsg($event, $msg);
 	}
@@ -163,23 +158,6 @@ class IRC extends IRCController
 		}
 
 		$this->muliLineMsg($event, $msg);
-	}
-
-	public function doDamage(User &$user)
-	{
-		$username = $user->getUsername();
-
-		$maxHP = $user->getMaxHP();
-		$damage = $user->doDamage(rand(0,40));
-		$newHP = $user->getHP();
-
-		$msg = "\n $username took $damage Damage. HP:$newHP/$maxHP";
-
-		if ($newHP == 0) {
-			$msg = "\n $username is KO'd";
-		}
-
-		return $msg;
 	}
 
 	public function aggrigateData()
