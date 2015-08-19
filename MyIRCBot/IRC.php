@@ -1,6 +1,7 @@
 <?php
 namespace MyIRCBot;
 
+use MyIRCBot\Entities\Attacks\Flip;
 use MyIRCBot\Entities\Attacks\Hadouken;
 use MyIRCBot\Entities\Attacks\Punch;
 use MyIRCBot\Entities\State;
@@ -102,16 +103,11 @@ class IRC extends IRCController
 
 		$sendingUser = $this->_users[$event->getRequest()->getSendingUser()];
 
-		if ($sendingUser->isConfused())
-		{
-			$sendingUsername = $sendingUser->getUsername();
+		$flip = new Flip();
+		$flip->performAttack($sendingUser, $user);
+		$msg = $flip->getDisplay($sendingUser, $user);
 
-			$event->addResponse(Response::action($event->getRequest()->getSource(),
-				"$sendingUsername flipped itself in confusion (╯ಥ益ಥ）╯﻿︵ " . StringTools::flip($sendingUsername)));
-		} else {
-			$event->addResponse(Response::action($event->getRequest()->getSource(),
-				"(╯ಥ益ಥ）╯﻿︵ " . StringTools::flip($user->getUsername())));
-		}
+		$this->muliLineMsg($event, $msg);
 	}
 
 	public function actionHadouken(Event $event)
@@ -143,7 +139,6 @@ class IRC extends IRCController
 			$msg .= "$username is now CONFUSED.";
 
 			$user->addState(new State(State::CONFUSED));
-			//$msg .= $this->doDamage($user);
 		}
 
 		$this->muliLineMsg($event, $msg);
@@ -183,22 +178,4 @@ class IRC extends IRCController
 			));
 		}
 	}
-
-	public function doDamage(User &$user)
-	{
-		$username = $user->getUsername();
-
-		$maxHP = $user->getMaxHP();
-		$damage = $user->doDamage(rand(0,40));
-		$newHP = $user->getHP();
-
-		$msg = "\n $username took $damage Damage. HP:$newHP/$maxHP";
-
-		if ($newHP == 0) {
-			$msg = "\n $username is KO'd";
-		}
-
-		return $msg;
-	}
-
 }

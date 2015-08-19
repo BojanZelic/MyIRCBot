@@ -2,28 +2,21 @@
 /**
  * Created by PhpStorm.
  * User: bzelic
- * Date: 8/13/15
- * Time: 11:48 AM
+ * Date: 8/19/15
+ * Time: 12:50 PM
  */
 
 namespace MyIRCBot\Entities\Attacks;
 
+
 use MyIRCBot\Entities\User;
 
-class Hadouken extends BaseAttack implements IAttack
+class Flip extends BaseAttack implements IAttack
 {
 	public $strength = 10;
 
 	public function performAttack(User $sending, User $receiving)
 	{
-		if ($sending->isConfused())
-		{
-			$this->message .= $this->doDamage($sending, $this);
-		} else
-		{
-			$this->message .= $this->doDamage($receiving, $this);
-		}
-
 		return $this->strength;
 	}
 
@@ -32,14 +25,14 @@ class Hadouken extends BaseAttack implements IAttack
 		$sendingUsername = $sending->getUsername();
 		if ($sending->isConfused())
 		{
-			$this->message .= "$sendingUsername ༼つಠ益ಠ༽つ ─=≡ΣO)) " . $sendingUsername;
+			$msg = "$sendingUsername (╯ಥ益ಥ）╯﻿︵  " . $sendingUsername;
 
 		} else {
 
-			$this->message .= "$sendingUsername ༼つಠ益ಠ༽つ ─=≡ΣO)) " .  $receiver->getUsername();
+			$msg = "$sendingUsername (╯ಥ益ಥ）╯﻿︵ " .  $receiver->getUsername();
 		}
 
-		return $this->message;
+		return $msg;
 	}
 
 	public function getStrength()

@@ -17,13 +17,12 @@ class Punch extends BaseAttack implements IAttack
 
 	public function performAttack(User $sending, User $receiving)
 	{
-		if($sending->isConfused())
+		if ($sending->isConfused())
 		{
-			$this->doDamage($sending, $this);
-		}
-		else
+			$this->message .= $this->doDamage($sending, $this);
+		} else
 		{
-			$this->doDamage($receiving, $this);
+			$this->message .= $this->doDamage($receiving, $this);
 		}
 
 		return $this->strength;
@@ -34,15 +33,14 @@ class Punch extends BaseAttack implements IAttack
 		$sendingUsername = $sending->getUsername();
 		if($sending->isConfused())
 		{
-			$msg = "$sendingUsername O=('-'Q)=  " . $sendingUsername;
+			$this->message .=  "$sendingUsername O=('-'Q)=  " . $sendingUsername;
 		}
 		else
 		{
-
-			$msg = $receiver->getUsername() ." O=('-'Q)= " .$sendingUsername;
+			$this->message .= $receiver->getUsername() ." O=('-'Q)= " .$sendingUsername;
 		}
 
-		return $msg;
+		return $this->message;
 	}
 
 	public function getStrength()

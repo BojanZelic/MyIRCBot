@@ -12,6 +12,7 @@ use MyIRCBot\Entities\User;
 
 abstract class BaseAttack
 {
+	protected $message = "";
 
 	public function doDamage(User &$user, IAttack $attack)
 	{
