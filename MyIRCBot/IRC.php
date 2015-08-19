@@ -2,6 +2,7 @@
 namespace MyIRCBot;
 
 use MyIRCBot\Entities\Attacks\Hadouken;
+use MyIRCBot\Entities\Attacks\Punch;
 use MyIRCBot\Entities\State;
 use MyIRCBot\Repositories\UserRepository;
 use MyIRCBot\Utilities\IRCController;
@@ -86,22 +87,10 @@ class IRC extends IRCController
 
 		$user = $this->_users[$username];
 		$sendingUser = $this->_users[$event->getRequest()->getSendingUser()];
-		if ($sendingUser->isConfused())
-		{
-			$username = $sendingUser->getUsername();
-			$msg = "$username punched himself in confusion." . $this->doDamage($sendingUser);
-		}
-		else
-		{
-			$msg = $this->doDamage($user);
-		}
 
-
-		if ($user->getIsMinion() && ($user->getHp() == 0))
-		{
-			$event->addResponse(Response::msg($user->getUsername(), 'killed'));
-		}
-
+		$punch = new Punch();
+		$punch->performAttack($sendingUser, $user);
+		$msg = $punch->getDisplay($sendingUser, $user);
 		$this->muliLineMsg($event, $msg);
 	}
 
