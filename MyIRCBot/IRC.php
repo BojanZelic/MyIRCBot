@@ -195,4 +195,21 @@ class IRC extends IRCController
 		}
 	}
 
+	public function doDamage(User &$user)
+	{
+		$username = $user->getUsername();
+
+		$maxHP = $user->getMaxHP();
+		$damage = $user->doDamage(rand(0,40));
+		$newHP = $user->getHP();
+
+		$msg = "\n $username took $damage Damage. HP:$newHP/$maxHP";
+
+		if ($newHP == 0) {
+			$msg = "\n $username is KO'd";
+		}
+
+		return $msg;
+	}
+
 }
