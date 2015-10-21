@@ -2,7 +2,11 @@
 	"require": {
 		"epochblue/philip": "1.0.*",
 		"doctrine/orm": "*",
-		"doctrine/migrations": "^1.0@RC"
+		"doctrine/migrations": "^1.0@RC",
+		"slim/slim": "2.*"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "4.8.*"
 	},
 	"prefer-stable": true,
 	"minimum-stability" : "dev",

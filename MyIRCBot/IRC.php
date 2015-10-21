@@ -8,72 +8,100 @@ use MyIRCBot\Entities\State;
 use MyIRCBot\Repositories\UserRepository;
 use MyIRCBot\Utilities\IRCController;
 use MyIRCBot\Utilities\StringTools;
-use Philip\IRC\Event;
-use Philip\IRC\Response;
-use Philip\Philip;
 use MyIRCBot\Entities\User;
+use Slim\Http\Request;
+use Slim\Http\Response;
+use Slim\Slim;
 
 class IRC extends IRCController
 {
-	private $_config;
+	//private $_config;
+
+	private $app;
 
 	/**
 	 * @var User[]
 	 */
 	private $_users;
 
-	/**
-	 * @var Philip
-	 */
-	private $bot;
-
 	private $userRepo;
-
-	public function setConfig($config)
-	{
-		$this->_config = $config;
-	}
 
 	public function main()
 	{
-		$this->bot = new Philip($this->_config);
+		$this->app = new Slim();
+		$app = $this->app;
 
-		for($i = 0; $i < 2; $i++)
+		$this->app->any("/slack", function () use ($app)
 		{
-			$rand = rand(1, 4000);
-			//exec('php ' . __DIR__ . "/../start.php minion $rand> /dev/null &");
-		}
+			$post = $_REQUEST;
+			$response = $app->response();
+			$response['Content-Type'] = 'text/html; charset=utf-8';
+			$response->status(200);
 
-		$this->bot->onMessages('/\$\([\'‘“`"][#\.](.*)[\'`’”"]\)\.(.*)\(\)/u', function(Event $event) {
-			$matches = $event->getMatches();
-			$username = $matches[0];
-			$action = "action" . $matches[1];
+			if($post['token'] !== "ITXszItA5nRBY5Hh1Ijxb9PK")
+			{
+				$response->body("Invalid Token");
+				return;
+			}
 
-			if (!isset($this->_users[$username]))
+			$command = $post['text'];
+			$matches = explode(" ", $command);
+
+			$sendingUser = $post['user_name'];
+
+			if (count($matches) !== 2)
+			{
+				$response->body("Invalid Usage");
+				return;
+			}
+
+			$username = $this->_getReceivingUser($app->request);
+			$action = $this->_getAction($app->request);
+
+			if(!isset($this->_users[$username]))
 			{
 				$user = new User();
 				$user->setUsername($username);
 				$this->_users[$username] = $user;
 			}
 
-			$sendingUser = $event->getRequest()->getSendingUser();
-			if (!isset($this->_users[$sendingUser]))
+			if(!isset($this->_users[$sendingUser]))
 			{
 				$user = new User();
 				$user->setUsername($sendingUser);
 				$this->_users[$sendingUser] = $user;
 			}
 
-			if (method_exists($this, $action)){
-				$this->$action($event);
+			if(method_exists($this, $action))
+			{
+				$message = $this->$action($app->request);
+				$response->body($message);
+				return;
 			}
 
+			$response->body("Invalid Usage");
 		});
 
-		$this->help();
-		$this->aggrigateData();
+		//$this->help();
+		//$this->aggrigateData();
 
-		$this->bot->run();
+		$this->app->run();
+	}
+
+	private function _getReceivingUser(Request $request)
+	{
+		$text = $request->params('text');
+		$matches = explode(" ", $text);
+
+		return $matches[1];
+	}
+
+	private function _getAction(Request $request)
+	{
+		$text = $request->params('text');
+		$matches = explode(" ", $text);
+
+		return "action" . $matches[0];
 	}
 
 	public function actionInvalid($event)
@@ -81,72 +109,73 @@ class IRC extends IRCController
 		//display message for 'no-can-do'
 	}
 
-	public function actionPunch(Event $event)
+	public function actionPunch(Request $request)
 	{
-		$matches = $event->getMatches();
-		$username = $matches[0];
+		$username = $this->_getReceivingUser($request);
 
 		$user = $this->_users[$username];
-		$sendingUser = $this->_users[$event->getRequest()->getSendingUser()];
+		$sendingUser = $this->_users[$request->params('user_name')];
 
 		$punch = new Punch();
 		$punch->performAttack($sendingUser, $user);
 		$msg = $punch->getDisplay($sendingUser, $user);
-		$this->muliLineMsg($event, $msg);
+		return $msg;
 	}
 
-	public function actionFlip(Event $event)
+	public function actionFlip(Request $request)
 	{
-		$matches = $event->getMatches();
-		$username = $matches[0];
+		$username = $this->_getReceivingUser($request);
 		$user = $this->_users[$username];
 
-		$sendingUser = $this->_users[$event->getRequest()->getSendingUser()];
+		$sendingUser = $this->_users[$request->params('user_name')];
 
 		$flip = new Flip();
 		$flip->performAttack($sendingUser, $user);
 		$msg = $flip->getDisplay($sendingUser, $user);
 
-		$this->muliLineMsg($event, $msg);
+		return $msg;
 	}
 
-	public function actionHadouken(Event $event)
+	public function actionHadouken(Request $request)
 	{
-		$matches = $event->getMatches();
-		$username = $matches[0];
+		$username = $this->_getReceivingUser($request);
+
 		$user = $this->_users[$username];
 
-		$sendingUser = $this->_users[$event->getRequest()->getSendingUser()];
+		$sendingUser = $this->_users[$request->params('user_name')];
 
 		$hadouken = new Hadouken();
 		$hadouken->performAttack($sendingUser, $user);
 		$msg = $hadouken->getDisplay($sendingUser, $user);
 
-		$this->muliLineMsg($event, $msg);
+		return $msg;
 	}
 
-	public function actionConfuse(Event $event)
+	public function actionConfuse(Request $request)
 	{
-		$matches = $event->getMatches();
-		$username = $matches[0];
+		$username = $this->_getReceivingUser($request);
+
 		$user = &$this->_users[$username];
 
 		$msg = "";
-		if ($user->isConfused())
+		if($user->isConfused())
 		{
 			$msg .= "$username is already CONFUSED!";
-		} else {
+		}
+		else
+		{
 			$msg .= "$username is now CONFUSED.";
 
 			$user->addState(new State(State::CONFUSED));
 		}
 
-		$this->muliLineMsg($event, $msg);
+		return $msg;
 	}
 
 	public function aggrigateData()
 	{
-		$this->bot->onJoin(function(Event $event) {
+		$this->bot->onJoin(function (Event $event)
+		{
 			$request = $event->getRequest();
 			$user = new User();
 			$user->updateFromRequest($request);
@@ -157,13 +186,13 @@ class IRC extends IRCController
 
 	public function help()
 	{
-		$this->bot->onMessages('/jQuery help/i', function($event) {
-			$msg = "Available Commands:" .
-			       "\n-------------------" .
-			       "\n$('#username').punch();";
-
-			$this->muliLineMsg($event, $msg);
-		});
+		//		$this->bot->onMessages('/jQuery help/i', function($event) {
+		//			$msg = "Available Commands:" .
+		//			       "\n-------------------" .
+		//			       "\n$('#username').punch();";
+		//
+		//			$this->muliLineMsg($event, $msg);
+		//		});
 	}
 
 	public function muliLineMsg($event, $msg)
@@ -173,7 +202,8 @@ class IRC extends IRCController
 		foreach($messages as $message)
 		{
 			$event->addResponse(Response::msg(
-				$event->getRequest()->getSource(),
+				$event->getRequest()
+				      ->getSource(),
 				$message
 			));
 		}
