@@ -10,6 +10,7 @@ namespace MyIRCBot\Entities\Attacks;
 
 
 use MyIRCBot\Entities\User;
+use MyIRCBot\Utilities\StringTools;
 
 class Flip extends BaseAttack implements IAttack
 {
@@ -22,14 +23,15 @@ class Flip extends BaseAttack implements IAttack
 
 	public function getDisplay(User $sending, User $receiver)
 	{
-		$sendingUsername = $sending->getUsername();
+		$sendingUsername = StringTools::flip($sending->getUsername());
+		$receiverUsername = StringTools::flip($receiver->getUsername());
 		if ($sending->isConfused())
 		{
-			$msg = "$sendingUsername (╯ಥ益ಥ）╯﻿︵  " . $sendingUsername;
+			$msg = "(╯ಥ益ಥ）╯﻿︵  " . $sendingUsername;
 
 		} else {
 
-			$msg = "$sendingUsername (╯ಥ益ಥ）╯﻿︵ " .  $receiver->getUsername();
+			$msg = "(╯ಥ益ಥ）╯﻿︵ " .  $receiverUsername;
 		}
 
 		return $msg;

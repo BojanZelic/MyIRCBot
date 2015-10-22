@@ -32,11 +32,11 @@ class Hadouken extends BaseAttack implements IAttack
 		$sendingUsername = $sending->getUsername();
 		if ($sending->isConfused())
 		{
-			$this->message .= "$sendingUsername ༼つಠ益ಠ༽つ ─=≡ΣO)) " . $sendingUsername;
+			$this->message .= " ༼つಠ益ಠ༽つ ─=≡ΣO)) " . $sendingUsername;
 
 		} else {
 
-			$this->message .= "$sendingUsername ༼つಠ益ಠ༽つ ─=≡ΣO)) " .  $receiver->getUsername();
+			$this->message .= " ༼つಠ益ಠ༽つ ─=≡ΣO)) " .  $receiver->getUsername();
 		}
 
 		return $this->message;

@@ -22,10 +22,10 @@ abstract class BaseAttack
 		$damage = $user->doDamage(rand(0,40));
 		$newHP = $user->getHP();
 
-		$msg = "\n $username took $damage Damage. HP:$newHP/$maxHP";
+		$msg = "\n $username took $damage Damage. HP:$newHP/$maxHP \n";
 
 		if ($newHP == 0) {
-			$msg = "\n $username is KO'd";
+			$msg = "\n $username is KO'd \n";
 		}
 
 		return $msg;

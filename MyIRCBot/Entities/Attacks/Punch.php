@@ -33,11 +33,11 @@ class Punch extends BaseAttack implements IAttack
 		$sendingUsername = $sending->getUsername();
 		if($sending->isConfused())
 		{
-			$this->message .=  "$sendingUsername O=('-'Q)=  " . $sendingUsername;
+			$this->message .=  "$sendingUsername O=('-'Q)=  ";
 		}
 		else
 		{
-			$this->message .= $receiver->getUsername() ." O=('-'Q)= " .$sendingUsername;
+			$this->message .= $receiver->getUsername() ." O=('-'Q)= ";
 		}
 
 		return $this->message;
