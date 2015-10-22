@@ -35,12 +35,12 @@ class IRC extends IRCController
 		{
 			$post = $_REQUEST;
 			$response = $app->response();
-			$response['Content-Type'] = 'text/html; charset=utf-8';
+			$response['Content-Type'] = 'application/json';
 			$response->status(200);
 
-			if($post['token'] !== "ITXszItA5nRBY5Hh1Ijxb9PK")
+			if($post['token'] !== "hG235FjlUjsg5CVDybDcGphW")
 			{
-				$response->body("Invalid Token");
+				$response->body(json_encode(array('text' => 'Invalid Token')));
 				return;
 			}
 
@@ -51,7 +51,7 @@ class IRC extends IRCController
 
 			if (count($matches) !== 2)
 			{
-				$response->body("Invalid Usage");
+				$response->body(json_encode(array('text' => 'Invalid Usage')));
 				return;
 			}
 
@@ -75,7 +75,7 @@ class IRC extends IRCController
 			if(method_exists($this, $action))
 			{
 				$message = $this->$action($app->request);
-				$response->body($message);
+				$response->body(json_encode(array('text' => $message)));
 				return;
 			}
 
