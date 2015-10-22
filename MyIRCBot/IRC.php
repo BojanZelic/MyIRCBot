@@ -49,7 +49,7 @@ class IRC extends IRCController
 
 			$sendingUser = $post['user_name'];
 
-			if (count($matches) !== 2)
+			if (count($matches) !== 3)
 			{
 				$response->body(json_encode(array('text' => 'Invalid Usage')));
 				return;
@@ -79,7 +79,7 @@ class IRC extends IRCController
 				return;
 			}
 
-			$response->body("Invalid Usage");
+			$response->body(json_encode(array('text' => 'Invalid Usage')));
 		});
 
 		//$this->help();
@@ -93,7 +93,7 @@ class IRC extends IRCController
 		$text = $request->params('text');
 		$matches = explode(" ", $text);
 
-		return $matches[1];
+		return $matches[2];
 	}
 
 	private function _getAction(Request $request)
@@ -101,7 +101,7 @@ class IRC extends IRCController
 		$text = $request->params('text');
 		$matches = explode(" ", $text);
 
-		return "action" . $matches[0];
+		return "action" . $matches[1];
 	}
 
 	public function actionInvalid($event)
