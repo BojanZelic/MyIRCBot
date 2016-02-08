@@ -38,7 +38,7 @@ class IRC extends IRCController
 			$response['Content-Type'] = 'application/json';
 			$response->status(200);
 
-			if($post['token'] !== "s8yLGcl3nZHc608NM9Moqykx")
+			if($post['token'] !== "hG235FjlUjsg5CVDybDcGphW")
 			{
 				$response->body(json_encode(array('text' => 'Invalid Token')));
 				return;
